@@ -25,6 +25,13 @@ enum SlideContainerLock {
   right,
   none,
 }
+enum Direction { positive, negative }
+
+class SlideValue {
+  SlideValue({this.animationValue, this.animationDirection});
+  double animationValue;
+  SlideDirection animationDirection;
+}
 
 /// Container that can be slid vertically or horizontally.
 ///
@@ -106,7 +113,8 @@ class SlideContainer extends StatefulWidget {
   /// Called each frame when the slide gesture is active (i.e. after [onSlideStarted] and before [onSlideCompleted] or [onSlideCanceled]) and during the auto-slide.
   ///
   /// returns the normalized position of the slide container as a value between 0.0 and 1.0 where 0.0 means the container is at the starting position and 1.0 means the container is at [maxSlideDistance].
-  final ValueChanged<double> onSlide;
+
+  final ValueChanged<SlideValue> onSlide;
 
   /// Register this controller to be able to manually force a slide in a given direction.
   final SlideContainerController controller;
@@ -237,7 +245,11 @@ class _State extends State<SlideContainer> with TickerProviderStateMixin {
         AnimationController(vsync: this, duration: widget.autoSlideDuration)
           ..addListener(() {
             if (widget.onSlide != null)
-              widget.onSlide(animationController.value);
+              widget.onSlide(SlideValue(
+                  animationValue: animationController.value,
+                  animationDirection: dragValue < 0
+                      ? SlideDirection.negative
+                      : SlideDirection.positive));
             if (mounted) setState(() {});
           });
 

@@ -25,12 +25,22 @@ enum SlideContainerLock {
   right,
   none,
 }
-enum Direction { positive, negative }
+enum SlideDirection { positive, negative, neutral }
 
 class SlideValue {
   SlideValue({this.animationValue, this.animationDirection});
   double animationValue;
   SlideDirection animationDirection;
+}
+
+SlideDirection sliceDirectionFromDrag(double drag) {
+  if (drag < 0) {
+    return SlideDirection.negative;
+  } else if (drag > 0) {
+    return SlideDirection.positive;
+  } else {
+    return SlideDirection.neutral;
+  }
 }
 
 /// Container that can be slid vertically or horizontally.
@@ -247,9 +257,7 @@ class _State extends State<SlideContainer> with TickerProviderStateMixin {
             if (widget.onSlide != null)
               widget.onSlide(SlideValue(
                   animationValue: animationController.value,
-                  animationDirection: dragValue < 0
-                      ? SlideDirection.negative
-                      : SlideDirection.positive));
+                  animationDirection: sliceDirectionFromDrag(dragValue)));
             if (mounted) setState(() {});
           });
 
